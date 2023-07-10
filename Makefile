@@ -3,7 +3,7 @@
 
 DIRNAME := $(shell basename $(CURDIR))
 
-VERSION = 01
+VERSION = 02
 DOCNAME = $(DIRNAME)
 
 all: $(DOCNAME)-$(VERSION).txt $(DOCNAME)-$(VERSION).html

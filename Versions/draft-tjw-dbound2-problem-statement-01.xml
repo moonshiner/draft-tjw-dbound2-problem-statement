@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- name="GENERATOR" content="github.com/mmarkdown/mmark Mmark Markdown Processor - mmark.miek.nl" -->
+<rfc version="3" ipr="trust200902" docName="draft-tjw-dbound2-problem-statement-01" submissionType="IETF" category="info" xml:lang="en" xmlns:xi="http://www.w3.org/2001/XInclude" indexInclude="true" consensus="true">
+
+<front>
+<title abbrev="DBOUND2 Problem">Domain Boundaries 2.0 Problem Statement</title><seriesInfo value="draft-tjw-dbound2-problem-statement-01" stream="IETF" status="informational" name="Internet-Draft"></seriesInfo>
+<author initials="T." surname="Wicinski" fullname="Tim Wicinski"><organization></organization><address><postal><street></street>
+<city>Elkins</city>
+<code>26241</code>
+<country>USA</country>
+<region>WV</region>
+</postal><email>tjw.ietf@gmail.com</email>
+</address></author><date/>
+<area>Application</area>
+<workgroup>DBOUND2</workgroup>
+
+<abstract>
+<t>Internet clients attempt to make inferences about the administrative
+relationship based on domain names. Currently it is not possible to confirm
+organizational boundaries in the DNS.  Current mitigation strategies have
+there own issues.  This memo attempts to outline these issues.</t>
+</abstract>
+
+</front>
+
+<middle>
+
+<section anchor="introduction"><name>Introduction and Motivation</name>
+<t>Working off of the earlier problem statement <xref target="I-D.sullivan-dbound-problem-statement"></xref>,
+which we still consider valid. Various Internet protocols and applications
+require some mechanism for determining whether two domain names have some relation.</t>
+<t>The concept of an administrative boundary is by definition not present
+in the DNS. Relying on the DNS to divine administrative structure thus
+renders such solutions unreliable and unnecessarily constrained. For
+example, confirming or dismissing a relationship between two domain
+names based on the existence of a zone cut or common ancestry is often
+unfounded, and the notion of an upward &quot;tree walk&quot; as a search
+mechanism is, therefore, unacceptable.</t>
+<t>Currently, the most well known solution in existence is the Public
+Suffix List (PSL). The PSL is maintained by  and is kept current by
+volunteers on a best-effort basis. It contains a list of points in the
+hierarchical namespace at which registrations take place, and is used
+to identify the boundary between so-called &quot;public&quot; names (below which
+registrations can occur, such as &quot;.com&quot; or &quot;.org.uk&quot;) and the private
+names (organizational names) that domain registrars create within them.
+When this list is inaccurate, it exposes a deviation from reality that
+degrades service to some and can be exploited by others. As the PSL is
+the de-facto resource, and as there is not a more comprehensive,
+alternative solution for relationship identification, the PSL has often
+been misused to accomplish things beyond its capabilities. For example,
+there is no way to confirm the relationship between two domain names --
+the PSL may only signal that there is or is not a public boundary
+between the two. Additionally, there are questions about the
+scalability, central management, and third-party management of the PSL
+as it currently exists.</t>
+<t>Applications and organizations impose policies and procedures that create additional structure in their use of domain names. This creates many possible relationships that are not evident in the names themselves or in the operational, public representation of the names.</t>
+<t>(This document is currently being edited at
+<eref target="https://github.com/moonshiner/draft-tjw-dbound2-problem-statement)">https://github.com/moonshiner/draft-tjw-dbound2-problem-statement)</eref></t>
+</section>
+
+<section anchor="terminology"><name>Terminology</name>
+<t>The key words &quot;MUST&quot;, &quot;MUST NOT&quot;, &quot;REQUIRED&quot;, &quot;SHALL&quot;, &quot;SHALL NOT&quot;, &quot;SHOULD&quot;,
+&quot;SHOULD NOT&quot;, &quot;RECOMMENDED&quot;, &quot;NOT RECOMMENDED&quot;, &quot;MAY&quot;, and &quot;OPTIONAL&quot; in this
+document are to be interpreted as described in BCP 14 <xref target="RFC2119"></xref> <xref target="RFC8174"></xref>
+when, and only when, they appear in all capitals, as shown here.
+DNS terminology is as described in <xref target="RFC8499"></xref>.</t>
+</section>
+
+<section anchor="simplifying-the-list-of-possible-use-cases"><name>Simplifying the list of possible Use Cases</name>
+<t>A main topic that immediately arises from this discussion is the replacement
+of the Public Suffix List (PSL).  Currently, this document is not looking at
+the problem space with regards to it.</t>
+<t>From the previous problem statement, the one use case which</t>
+
+<section anchor="http-state-management-cookies"><name>HTTP State management cookies</name>
+
+<ul>
+<li><t>Cookies that have the same-site in browsers. For example:</t>
+<t>allowing www.example.com to respond with a set-cookie for example.com
+so *.example.com will work.</t>
+<t>not allowing example1.co.uk to respond with a set-cookie for example2.co.uk.</t>
+</li>
+<li><t>CA wildcards: it's OK to sign a cert for *.example.co.uk or *.example.com but not for .co.uk or *.com.</t>
+</li>
+</ul>
+<t>Other applications and organizations impose policies and procedures that
+create additional structure to express many possible relationships,
+such as in first-party-sets or IDN-UA. These are not always evident
+in the names themselves, and any solutions developed here may or may
+not suit these existing policies and procedures.</t>
+</section>
+
+<section anchor="service-boundaries-in-shared-cloud-environments"><name>Service Boundaries in shared cloud environments</name>
+<t>A public cloud provider may have a large number of boundaries they need
+to publish.  Taking an
+example resource within an example service, that resource might have a
+domain name that follows the below pattern (2LD may vary):</t>
+<t>&quot;resource-id.cluster-id.servicename.region-name.example.com&quot;</t>
+<t>With the current PSL, the need may exist to publish 1+ records per region per
+service. If there are many services across many more regions, these updates
+do not scale. Putting this information into DNS allows us to publish records,
+without manual updates.</t>
+</section>
+
+<section anchor="network-resource-boundaries-in-shared-cloud-environments"><name>Network resource boundaries in shared cloud environments</name>
+<t>Network suffixes and resouces that are public, but not routable or resolvable
+outside of one's network (public-like-PSL, not public-like-pool). A good
+example is an internal zone within a virtual private
+clouds (VPCs).</t>
+<t>VPCs are resources customers can create, which reserves
+them a logically-isolated portion of AWS's network. Within each VPC,
+there is a VPC-internal DNS zone which contains DNS records for
+resources within the VPC (suffix zone of &quot;compute.internal&quot; or
+equivalent), which is separated per-VPC. Every network interface in a
+VPC will have an associated per-interface record in this zone (for VPCs
+using a default configuration).</t>
+<t>These customers may chose to peer their VPC with another customer,
+and these VPC-internal zone would now have multiple different customers
+operating within it.</t>
+
+<ul spacing="compact">
+<li>Linking domains together</li>
+</ul>
+<t>In terms of specific use cases, within the realm of email there is a
+desire to link an arbitrary fully-qualified domain name (FQDN) to the
+organizational domain name (at some point in the namespace above it),
+in order to identify a deterministic location where some sort of
+statement of policy regarding that FQDN can be found.</t>
+<t>There is another growing use case within organizations that need to identify
+relationships between different FQDNs, but also different top level
+domains. However, there is also desire to reliably identify relationships
+outside of the realm and constraints of the namespace tree.</t>
+</section>
+</section>
+
+<section anchor="security-considerations"><name>Security Considerations</name>
+<t>None at this time.</t>
+</section>
+
+<section anchor="iana-considerations"><name>IANA Considerations</name>
+<t>None at this time.</t>
+</section>
+
+</middle>
+
+<back>
+<references><name>Normative References</name>
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"/>
+</references>
+<references><name>Informative References</name>
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml-ids/reference.I-D.sullivan-dbound-problem-statement.xml"/>
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml"/>
+<xi:include href="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.8499.xml"/>
+</references>
+
+<section anchor="acknowledgements"><name>Acknowledgements</name>
+<t>The author leans heavily on the initial problem statement and thanks Andrew
+Sullivan, John Levine, Murray Kucherawy and Paul Vixie for comments and
+suggestions.</t>
+</section>
+
+<section anchor="appendix"><name>Appendix</name>
+</section>
+
+<section anchor="acknowledgements-1" numbered="false"><name>Acknowledgements</name>
+</section>
+
+</back>
+
+</rfc>
